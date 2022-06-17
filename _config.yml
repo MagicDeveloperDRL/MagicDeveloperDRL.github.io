@@ -1,9 +1,14 @@
-title: Hamilton
-description: A minimal and beautiful Jekyll theme best for writing and note-taking.
-author: Shangzhi Huang
+title: MagicDeveloper
+description: 博客原创，请勿转载.
+sidebar-about-description: 欢迎来到我的个人博客网站.
+author: MRL Liu
 avatar: /logo.png
-email: ngzhio@gmail.com
-
+QRcode: /QRcode.png
+email: 1548390588@qq.com
+location: 中国
+skin: daylight # daylight midnight
+subscribe: False
+markdown: kramdown # 允许渲染latex公式
 plugins:
   - jekyll-seo-tag
   - jekyll-feed
@@ -11,7 +16,7 @@ plugins:
   - jekyll-paginate
 
 paginate: 10
-
+toc: True # 是否打开
 # Uncomment the below line and set the tracking ID for enabling Google Analytics
 # 
 # google_analytics: 
