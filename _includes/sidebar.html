@@ -1,0 +1,81 @@
+{% if site.avatar -%}
+  <div class="sidebar-section">
+    {%- if site.avatar contains "://" -%}
+      {%- assign avatar = site.avatar -%}
+    {%- else -%}
+      {%- assign avatar = site.avatar | relative_url -%}
+    {%- endif -%}
+    <img src="{{ avatar }}" class="author-avatar u-photo align-center" alt="{{ site.author }}">
+  </div>
+{%- endif %}
+
+<div class="sidebar-section">
+  <ul class="contact-list">
+	<h5>作者信息</h5>
+    {% if site.author -%}
+      <li>
+        <i class="sidebar-icon fas fa-at"></i>
+        <span class="contact-info p-name">{{ site.author | escape }}</span>
+      </li>
+    {%- endif %}
+	
+	{% if site.location -%}
+      <li>
+        <i class="sidebar-icon fas fa-location-arrow"></i>
+        <a class="contact-info u-location" href="https://www.google.com/maps/search/{{ site.location }}">{{ site.location }}</a>
+      </li>
+    {%- endif %}
+	
+	{% if site.sidebar-about-description -%}
+      <li>
+        <span class="contact-info p-name">{{ site.sidebar-about-description | escape }}</span>
+      </li>
+    {%- endif %}
+	
+  </ul>
+</div>
+
+<div class="sidebar-section">
+  <ul class="contact-list">
+	<h5>联系方式</h5>
+    {% if site.email -%}
+      <li>
+        <i class="sidebar-icon fas fa-envelope"></i>
+        <a class="contact-info u-email" href="mailto:{{ site.email }}">{{ site.email }}</a>
+      </li>
+    {%- endif %}
+    
+  </ul>
+</div>
+
+
+{% if site.subscribe != false -%}
+<div class="sidebar-section feed-subscribe">
+  <a href="{{ 'feed.xml' | relative_url }}">
+    <i class="sidebar-icon fas fa-rss"></i><span>Subscribe</span>
+  </a>
+</div>
+{%- endif %}
+
+{% if site.data.social -%}
+  <div class="sidebar-section">
+    <ul class="social-icons">
+	<h5>社交媒体</h5>
+      {% for social in site.data.social -%}
+        <li>
+          <a class="social-icon" href="{{ social.url }}"><i class="{{ social.icon | default: 'fas fa-link' }} fa-2x" title="{{ social.title }}"></i></a>
+        </li>
+      {%- endfor %}
+    </ul>
+  </div>
+{%- endif %}
+{% if site.QRcode -%}
+  <div class="sidebar-section">
+    {%- if site.QRcode contains "://" -%}
+      {%- assign QRcode = site.QRcode -%}
+    {%- else -%}
+      {%- assign QRcode = site.QRcode | relative_url -%}
+    {%- endif -%}
+    <img src="{{ QRcode }}"  alt="{{ site.QRcode }}">
+  </div>
+{%- endif %}
