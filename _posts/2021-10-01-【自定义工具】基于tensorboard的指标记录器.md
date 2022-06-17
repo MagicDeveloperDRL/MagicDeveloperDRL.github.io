@@ -1,0 +1,174 @@
+---
+layout:     post
+title:      「自定义工具」基于tensorboard的指标记录器
+subtitle:   基于Pytorch平台
+date:       2021-10-01
+author:     MRL Liu
+header-img: img/the-first.png
+catalog: True
+tags:
+    - 自定义工具
+---
+
+PSNR和SSIM是深度学习领域中经常出现的用来评价图像质量的两个指标。
+
+## 一、结构相似性（SSIM）
+
+### 1、什么是结构相似性
+
+​		`结构相似性`(Structural Similarity，简称SSIM)是一种衡量两幅图像相似度的指标。SSIM使用的两张图像中，一张为未经压缩的无失真图像，另一张为失真后的图像。
+
+​		作为结构相似性理论的实现，SSIM从图像组成的角度将结构信息定义为独立于亮度、对比度的，反映场景中物体结构的属性，并将失真建模为`亮度`、`对比度`和`结构`三个不同因素的组合。用`均值`作为亮度的估计，`标准差`作为对比度的估计，`协方差`作为结构相似程度的度量。
+
+​		其计算公式为：
+
+![]({{site.baseurl}}/img-post/「技术笔记」图像生成的评价指标PSNR和SSIM/SSIM的计算公式.png)
+
+### 2、结构相似性的取值
+
+SSIM的范围为-1到1，SSIM值越大，两张图片越相似，当两张图像一模一样时，SSIM的值等于1。
+
+### 3、如何在python中使用结构相似性衡量两张图片？
+
+首先请确保安装基于scipy的图像处理包scikit-image（`pip install scikit-image`）
+
+```python
+from skimage.metrics import structural_similarity as SSIM # 结构相似性
+# fake和real 都是numpy.ndarray类型，shape=（256，256，3），mode=hwc,返回的ssim是一个float类型
+ssim = SSIM(fake, real, multichannel=True) # 结构相似性
+def SSIM(img1, img2):
+    # 计算F.conv2d用到的window
+    (_, channel, _, _) = img1.size() # 得到图片的通道数
+    window_size = 11
+    window = create_window(window_size, channel)
+
+    if img1.is_cuda:
+        window = window.cuda(img1.get_device())
+    window = window.type_as(img1)
+
+    # 计算SSIM公式中需要的各部分
+
+    mu1 = F.conv2d(img1, window, padding=window_size // 2, groups=channel) # 得到空洞卷积后的图片 mu1, 对应公式中图像像素的均值
+    mu2 = F.conv2d(img2, window, padding=window_size // 2, groups=channel)
+    # print('mu1.shape',mu1.shape) # torch.Size([1, 3, 256, 256])
+
+    mu1_sq = mu1.pow(2) # mu1的平方，对应公式中图像像素均值的平方
+    mu2_sq = mu2.pow(2)
+    mu1_mu2 = mu1 * mu2
+
+    sigma1_sq = F.conv2d(img1 * img1, window, padding=window_size // 2, groups=channel) - mu1_sq # img1 * img1经过空洞卷积后的结果：sigma1_sq对应公式中图像像素的方差
+    sigma2_sq = F.conv2d(img2 * img2, window, padding=window_size // 2, groups=channel) - mu2_sq
+    sigma12 = F.conv2d(img1 * img2, window, padding=window_size // 2, groups=channel) - mu1_mu2# 对应公式中两个图像的协方差
+
+    # C1,C2是SSIM公式中用来维持稳定的常数。
+    C1 = 0.01 ** 2
+    C2 = 0.03 ** 2
+
+    # 根据SSIM公式，计算结果
+    ssim_map = ((2 * mu1_mu2 + C1) * (2 * sigma12 + C2)) / ((mu1_sq + mu2_sq + C1) * (sigma1_sq + sigma2_sq + C2))
+
+     # 最后取均值作为全局的SSIM
+    return ssim_map.mean()
+```
+
+## 二、峰值信噪比（PSNR）
+
+### 1、什么是结构相似性
+
+​		`峰值信噪比`(Peak Signal-to-Noise Ratio，简称PSNR) 是最普遍和使用最为广泛的一种图像客观评价指标，但是它是基于对应像素点间的误差，即基于误差敏感的图像质量评价。
+
+​		由于并未考虑到人眼的视觉特性（人眼对空间频率较低的对比差异敏感度较高，人眼对亮度对比差异的敏感度较色度高，人眼对一个 区域的感知结果会受到其周围邻近区域的影响等），因而经常出现评价结果与人的主观感觉不一致的情况。
+
+​		其计算公式如下：
+
+![]({{site.baseurl}}/img-post/「技术笔记」图像生成的评价指标PSNR和SSIM/PSNR的计算公式.png)
+
+### 2、结构相似性的取值
+
+PSNR:数值越大表示失真越小。
+
+### 3、如何在python中使用结构相似性衡量两张图片？
+
+```Python
+def PSNR(img1, img2):
+    # 计算两张图像的均方误差
+    mse = np.mean((img1 / 255. - img2 / 255.) ** 2)
+    if mse == 0:
+        return 100
+    # 图片中可能的最大像素值，一般地，针对 uint8 数据，最大像素值为 255,；针对浮点型数据，最大像素值为 1。
+    PIXEL_MAX = 1
+    # PSNR计算公式
+    PSNR = 20 * math.log10(PIXEL_MAX / math.sqrt(mse))
+    return PSNR
+
+# fake和real 都是numpy.ndarray类型，shape=（256，256，3），mode=hwc,返回的psnr是一个float类型
+psnr = PSNR(fake, real) # 峰值信噪比
+```
+
+### 三、如何在代码中计算该评价指标
+
+我们直接给出我们封装的一些函数：
+
+```Python
+'''''''''
+@文件名: metrics.py
+@作者: XW,MRL Liu
+@时间: 2021/9/29 22:31
+@环境: python,numpy,torch,scikit-image,math
+@描述: 图像相似度评价指标计算辅助工具
+@参考: 无
+'''''''''
+import torch
+import math
+import numpy as np
+import torch.nn.functional as F
+from torch.autograd import Variable
+
+
+####################################
+# 峰值信噪比 PSNR
+####################################
+def PSNR(img1, img2)-> (float):
+    # 检查是否是numpy.ndarray类型
+    if torch.is_tensor(img1):
+        img1 = tensor2im(img1)
+    if torch.is_tensor(img2):
+        img2 = tensor2im(img2)
+    # 计算两张图像的均方误差
+    mse = np.mean((img1 / 255. - img2 / 255.) ** 2)
+    if mse == 0:
+        return 100
+    # 图片中可能的最大像素值，一般地，针对 uint8 数据，最大像素值为 255,；针对浮点型数据，最大像素值为 1。
+    PIXEL_MAX = 1
+    # PSNR计算公式
+    PSNR = 20 * math.log10(PIXEL_MAX / math.sqrt(mse))
+    return PSNR
+
+####################################
+# 结构相似性 SSIM
+####################################
+
+def SSIM(img1,img2,multichannel=True) -> (float):
+    # 检查是否是numpy.ndarray类型
+    if torch.is_tensor(img1):
+        img1 = tensor2im(img1)
+    if torch.is_tensor(img2):
+        img2 = tensor2im(img2)
+    # 计算
+    from skimage.metrics import structural_similarity as SSIM  # 导入scikit-image
+    ssim = SSIM(img1, img2, multichannel=multichannel)
+    return ssim
+
+# 将一个tensor转换为数组
+def tensor2im(image_tensor, imtype=np.uint8):
+    image_numpy = image_tensor[0].cpu().float().numpy()
+    image_numpy = (np.transpose(image_numpy, (1, 2, 0)) + 1) / 2.0 * 255.0
+    return image_numpy.astype(imtype)
+
+if __name__=="__main__":
+    input =  torch.rand(1,3, 256, 256) # shape=(batchSize,channels,height,width)
+    target = torch.rand(1,3, 256, 256) # shape=(batchSize,channels,height,width)
+    print('PSNR:', PSNR(input, target))
+    print('SSIM:', SSIM(input, target))
+```
+
