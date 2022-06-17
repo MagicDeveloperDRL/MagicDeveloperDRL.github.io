@@ -3,9 +3,10 @@ layout: default
 ---
 
 <div class="home">
-
+  <script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+  本站访问量类计<font color="red"><span id="busuanzi_value_site_pv"></span></font>次
+  
   {{ content }}
-
   {% if site.paginate %}
     {% assign posts = paginator.posts %}
   {% else %}
@@ -58,7 +59,7 @@ layout: default
     {%- endif %}
 
   {%- endif -%}
-  
+   <script type="text/javascript" id="clustrmaps" src="//clustrmaps.com/map_v2.js?d=rlpBFQwOx4PvTPStFcLFKDsbdnGsRkl29htdFbFcgU4&cl=ffffff&w=a"></script>
   {%- if jekyll.environment == "production" and site.disqus -%}
     <script id="dsq-count-scr" src="//{{ site.disqus }}.disqus.com/count.js" async></script>
   {%- endif -%}

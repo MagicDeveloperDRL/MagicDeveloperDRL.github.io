@@ -13,3 +13,21 @@ layout: default
   </div>
 
 </article>
+
+<!--gitalk js code start-->
+<div id="gitalk-container"></div>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.css">
+<script src="https://cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.js"></script>
+<script type="text/javascript">
+      var gitalk = new Gitalk({
+        id: window.location.pathname,
+        clientID: 'f1a3a121b7ba62742ecb',
+        clientSecret: 'f45e734a26ec1c864a1743374c32f7952f0ab2da',
+        repo: 'MagicDeveloperDRL.github.io',
+        owner: 'MagicDeveloperDRL',
+        admin: ['MagicDeveloperDRL'],
+        distractionFreeMode: false
+      });
+      gitalk.render('gitalk-container');
+</script>
+<!--gitalk js code end-->

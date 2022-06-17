@@ -15,6 +15,8 @@
 {% endif %}
 
 <!-- Google Fonts -->
+<link rel="icon" href=".//img/favicon.ico"/>
+<title>个人博客，让沟通更容易</title>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Open%20Sans|Roboto|Roboto%20Slab|Inconsolata|Dancing%20Script|Noto%20Sans%20SC|Noto%20Sans%20TC|Noto%20Serif%20SC|Noto%20Serif%20TC|Ma%20Shan%20Zheng">
 
 <link rel="stylesheet" href="{{ '/assets/css/main.css' | relative_url }}">
@@ -46,3 +48,14 @@
 <script async src="https://use.fontawesome.com/releases/v5.0.12/js/all.js"></script>
 
 {% include custom-head.html %}
+
+<script type="text/x-mathjax-config">
+    MathJax.Hub.Config({
+        tex2jax: {
+        skipTags: ['script', 'noscript', 'style', 'textarea', 'pre'],
+        inlineMath: [['$','$']]
+        }
+    });
+</script>
+<script src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML" type="text/javascript"></script>
+
