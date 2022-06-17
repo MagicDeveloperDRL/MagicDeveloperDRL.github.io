@@ -13,10 +13,6 @@ tags:
 
 ​	   超文本传输协议HTTP（Hyper Text Transfer Protocol）是Web服务的应用层协议，超本文指的是含有超链接的文本，HTTP不仅可以传输文本，还可以传输图片、视频等更多信息形式。
 
-
-
-基于Socket的HTTP连接
-
 # 一、HTTP请求和响应
 
 ## 1、使用浏览器访问服务器
