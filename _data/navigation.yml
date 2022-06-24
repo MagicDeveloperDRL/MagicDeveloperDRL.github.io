@@ -10,7 +10,7 @@
 
 - title: 更多内容
   sublinks:
-    - title: 关于作者
-      url: /about/
+    #- title: 关于作者
+    #  url: /about/
     - title: 文档说明
       url: /docs/
