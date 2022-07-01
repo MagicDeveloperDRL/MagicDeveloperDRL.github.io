@@ -23,7 +23,7 @@ tags: [环境配置]
 
 ### 2、APT安装
 
-​			然后从APT存储库安装MySQL，执行`sudo apt install MySQL-server`，在安装过程中，可能会出现[Y / n]问题，输入Y继续。
+​			然后从APT存储库安装MySQL，执行`suo apt install MySQL-server`，在安装过程中，可能会出现[Y / n]问题，输入Y继续。
 
 ​			如果上述安装出现问题，例如`E:无法定位软件包问题`。这时可以考虑使用命令`sudo apt-get install MySQL-server`
 
